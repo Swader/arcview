@@ -4,3 +4,4 @@ build
 archive
 .vscode
 src/config.ts
+!.gitkeep

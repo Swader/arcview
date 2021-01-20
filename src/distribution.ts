@@ -11,13 +11,10 @@ export const getStakers = async function (): Promise<Staker[]> {
   for (const addy of uniques) {
     // Read the contract state
     const s = await farm.stakers(addy);
-    const staker = Object.create(s) as Staker;
-    staker.earned = ethers.BigNumber.from(await farm.earned(addy));
+    const staker = ethers.utils.shallowCopy(s) as Staker;
+    staker.earned = await farm.earned(addy);
     staker.address = addy;
     stakers.push(staker);
-    if (stakers.length == 3) {
-      break;
-    }
   }
   return stakers;
 };
@@ -31,7 +28,7 @@ export const getIncomingTransactions = async (): Promise<
       `https://api.etherscan.io/api?module=account&action=tokentx&address=${FARM_ADDRESS}&startblock=11611744&sort=asc&apikey=${ETHERSCAN_KEY}`,
       { timeout: 10000 }
     );
-    console.log(result);
+    //console.log(result);
     for (const r of result.data.result) {
       if (r.to === FARM_ADDRESS) {
         etx.push(r as EtherscanTransaction);

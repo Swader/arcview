@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ArcX Whalewatch</title>
+    <link href="assets/c3.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/sweetalert.css" />
+    <link rel="stylesheet" href="assets/water.css" />
+    <script src="assets/d3.min.js" charset="utf-8"></script>
+    <script src="assets/c3.min.js"></script>
+    <script src="assets/jquery-3.5.1.min.js"></script>
+    <script src="assets/bn.js"></script>
+    <script src="assets/sweetalert.js"></script>
+  </head>
+  <body>
+    <h1>
+      Viewing
+      <a
+        href="https://etherscan.io/address/0xd41a21F6a3DEbFe28b06ace2312A69c53107ceE5"
+        >reward pool 5 - USDC-STABLEx</a
+      >
+    </h1>
+
+    <div id="chart"></div>
+    <table id="basic">
+      <thead>
+        <tr>
+          <th>Pool basic info</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Total tokens in pool</td>
+          <td class="total"></td>
+        </tr>
+        <tr>
+          <td>Unique stakers</td>
+          <td class="stakernum"></td>
+        </tr>
+      </tbody>
+    </table>
+    <h2>Top earners</h2>
+    <table class="earners">
+      <thead>
+        <tr>
+          <th>Address</th>
+          <th>Earnings</th>
+          <th>Balance</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <script>
+      const HUNDRED = new BN(100);
+
+      function redraw() {
+        // Get the cached entries
+        $.getJSON("/cache/stakers.json", function (result) {
+          // Do something with them
+          const d = [];
+          let total = new BN(0);
+          for (r of result) {
+            const amount = new BN(r.balance.hex.substr(2), 16);
+            total = total.add(amount);
+          }
+
+          sortAndRender(result);
+
+          document.querySelector("#basic .total").innerText = stringToDec(
+            total.toString(),
+            18
+          );
+
+          document.querySelector("#basic .stakernum").innerText = result.length;
+
+          let others = new BN(0);
+          let othersNum = 0;
+
+          for (r of result) {
+            const amount = new BN(r.balance.hex.substr(2), 16);
+            if (amount.gt(new BN(0))) {
+              //console.log(`${amount} is > 0`);
+              if (amount.mul(HUNDRED).gt(total)) {
+                //console.log(`${amount.mul(HUNDRED)} is > total of ${total}`);
+                d.push([r.address, amount]);
+              } else {
+                //console.log(`${amount.mul(HUNDRED)} is < total of ${total}`);
+                others = others.add(amount);
+                othersNum++;
+              }
+            }
+          }
+
+          d.push([`${othersNum} stakers under 1%`, others]);
+
+          // Draw chart
+          var chart = c3.generate({
+            bindto: "#chart",
+            tooltip: {
+              format: {
+                title: function (d) {
+                  return d;
+                },
+                value: function (value, ratio, id) {
+                  return stringToDec(value.toString(), 18, 6);
+                },
+              },
+            },
+            data: {
+              // iris data from R
+              columns: d,
+              type: "pie",
+              onmouseover: () => false,
+              onmouseout: () => false,
+              onclick: function (d, i) {
+                Swal.fire({
+                  title: "Info",
+                  text: d.id,
+                  icon: "info",
+                  confirmButtonText: "Copy to clipboard",
+                  preConfirm: function () {
+                    var textArea = document.createElement("textarea");
+                    textArea.value = document.getElementById(
+                      "swal2-content"
+                    ).innerText;
+
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+
+                    try {
+                      var successful = document.execCommand("copy");
+                      var msg = successful ? "successful" : "unsuccessful";
+                    } catch (err) {}
+
+                    document.body.removeChild(textArea);
+
+                    return true;
+                  },
+                });
+              },
+            },
+            legend: {
+              show: false,
+            },
+          });
+        });
+      }
+
+      setInterval(redraw, 20000);
+      redraw();
+
+      function stringToDec(string, decimals, shownDecimals) {
+        if (undefined === shownDecimals) {
+          shownDecimals = 0;
+        }
+        if (string.length <= decimals) {
+          string = string.padStart(decimals + 1, "0");
+        }
+        let dec = string.substr(-decimals);
+        if (shownDecimals) {
+          dec = dec.substr(0, shownDecimals);
+        }
+        const whole = string.substr(0, string.length - decimals);
+        return `${whole}.${dec}`;
+      }
+
+      function sortAndRender(result) {
+        const sorted = result.sort((a, b) => {
+          const af = new BN(a.earned.hex.substr(2), 16);
+          const bf = new BN(b.earned.hex.substr(2), 16);
+          return af.gt(bf) ? -1 : 1;
+        });
+        const tableBody = document.querySelector("table.earners tbody");
+        let rowString = "";
+        for (r of sorted) {
+          if (r.address == "0x0000000000000000000000000000000000000000")
+            continue;
+          let earned = stringToDec(
+            new BN(r.earned.hex.substr(2), 16).toString(),
+            18,
+            6
+          );
+          let balance = stringToDec(
+            new BN(r.balance.hex.substr(2), 16).toString(),
+            18,
+            6
+          );
+          rowString += `<tr><td>${r.address}</td><td>${earned}</td><td>${balance}</td></tr>`;
+        }
+        tableBody.innerHTML = rowString;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+name: Refresh stakers
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: "*/15 * * * *"
+
+jobs:
+  refresh-stakers:
+    name: trigger a re-download of stakers and their balances
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Update stakers list
+        run: yarn start
