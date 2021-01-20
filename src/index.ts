@@ -6,7 +6,7 @@ import { getStakers } from "./distribution";
 program.command("start").action(async function () {
   // Do something
   const stakers = await getStakers();
-  fs.writeFileSync("public/cache/stakers.json", JSON.stringify(stakers));
+  fs.writeFileSync("docs/cache/stakers.json", JSON.stringify(stakers));
   console.log(`Logged ${stakers.length} stakers.`);
 });
 
