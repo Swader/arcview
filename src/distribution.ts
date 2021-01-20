@@ -1,5 +1,4 @@
 import axios from "axios";
-// import { ETHERSCAN_KEY, FARM_ADDRESS, NODE_URL } from "./config";
 import { ethers, BigNumber } from "ethers";
 import { p5abi } from "./abi";
 
