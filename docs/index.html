@@ -56,7 +56,7 @@
 
       function redraw() {
         // Get the cached entries
-        $.getJSON("/cache/stakers.json", function (result) {
+        $.getJSON("cache/stakers.json", function (result) {
           // Do something with them
           const d = [];
           let total = new BN(0);
