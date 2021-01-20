@@ -1,12 +1,32 @@
 import axios from "axios";
-import { ETHERSCAN_KEY, FARM_ADDRESS, NODE_URL } from "./config";
+// import { ETHERSCAN_KEY, FARM_ADDRESS, NODE_URL } from "./config";
 import { ethers, BigNumber } from "ethers";
 import { p5abi } from "./abi";
+
+const FARM_ADDRESS = process.env.FARM_ADDRESS
+  ? process.env.FARM_ADDRESS
+  : "0xd41a21f6a3debfe28b06ace2312a69c53107cee5";
+
+const ETHERSCAN_KEY = process.env.ETHERSCAN_KEY
+  ? process.env.ETHERSCAN_KEY
+  : null;
+
+if (!ETHERSCAN_KEY) {
+  console.error("Etherscan key missing.");
+  process.exit(1);
+}
+
+const NODE_URL = process.env.NODE_URL ? process.env.NODE_URL : null;
+
+if (!NODE_URL) {
+  console.error("Node URL missing.");
+  process.exit(1);
+}
 
 export const getStakers = async function (): Promise<Staker[]> {
   const stakers: Staker[] = [];
   const uniques = await getUniqueAddresses();
-  const provider = new ethers.providers.JsonRpcProvider(NODE_URL);
+  const provider = new ethers.providers.JsonRpcProvider(process.env.NODE_URL);
   const farm = new ethers.Contract(FARM_ADDRESS, p5abi, provider);
   for (const addy of uniques) {
     // Read the contract state
@@ -25,7 +45,7 @@ export const getIncomingTransactions = async (): Promise<
   const etx: EtherscanTransaction[] = [];
   try {
     const result = await axios.get(
-      `https://api.etherscan.io/api?module=account&action=tokentx&address=${FARM_ADDRESS}&startblock=11611744&sort=asc&apikey=${ETHERSCAN_KEY}`,
+      `https://api.etherscan.io/api?module=account&action=tokentx&address=${FARM_ADDRESS}&startblock=11611744&sort=asc&apikey=${process.env.ETHERSCAN_KEY}`,
       { timeout: 10000 }
     );
     //console.log(result);
