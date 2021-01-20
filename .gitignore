@@ -1,0 +1,6 @@
+node_modules
+*.log
+build
+archive
+.vscode
+src/config.ts
