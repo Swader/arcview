@@ -3,7 +3,7 @@ name: Refresh stakers
 on:
   schedule:
     # * is a special character in YAML so you have to quote this string
-    - cron: "*/15 * * * *"
+    - cron: "*/7 * * * *"
 
 jobs:
   refresh-stakers:
@@ -12,4 +12,4 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Update stakers list
-        run: yarn start
+        run: yarn && yarn start
