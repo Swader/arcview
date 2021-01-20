@@ -19,4 +19,4 @@ jobs:
         env:
           NODE_URL: ${{ secrets.NODE_URL }}
           ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
-          FARM_ADDRESS: 0xd41a21f6a3debfe28b06ace2312a69c53107cee5
+          FARM_ADDRESS: "0xd41a21f6a3debfe28b06ace2312a69c53107cee5"
