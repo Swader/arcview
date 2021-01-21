@@ -22,5 +22,5 @@ jobs:
           FARM_ADDRESS: "0xd41a21f6a3debfe28b06ace2312a69c53107cee5"
       - uses: actions/upload-artifact@v2
         with:
-        name: stakers.json
-        path: public/cache/stakers.json
+          name: stakers.json
+          path: public/cache/stakers.json
