@@ -23,4 +23,4 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: stakers.json
-          path: public/cache/stakers.json
+          path: docs/cache/stakers.json
