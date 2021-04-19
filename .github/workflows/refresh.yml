@@ -1,29 +1,29 @@
-name: Refresh stakers
+# name: Refresh stakers
 
-on:
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron: "*/7 * * * *"
-  push:
-    branches:
-      - master
+# on:
+#   schedule:
+#     # * is a special character in YAML so you have to quote this string
+#     - cron: "*/7 * * * *"
+#   push:
+#     branches:
+#       - master
 
-jobs:
-  refresh-stakers:
-    name: trigger a re-download of stakers and their balances
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - name: Update stakers list
-        run: yarn && yarn start
-        env:
-          NODE_URL: ${{ secrets.NODE_URL }}
-          ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
-          FARM_ADDRESS: "0xd41a21f6a3debfe28b06ace2312a69c53107cee5"
-      - name: Commit changes
-        uses: EndBug/add-and-commit@v7
-        with:
-          author_name: Commitobot
-          author_email: bruno@skvorc.me
-          message: "Updating stakers!"
-          add: "docs/cache/stakers.json"
+# jobs:
+#   refresh-stakers:
+#     name: trigger a re-download of stakers and their balances
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@master
+#       - name: Update stakers list
+#         run: yarn && yarn start
+#         env:
+#           NODE_URL: ${{ secrets.NODE_URL }}
+#           ETHERSCAN_KEY: ${{ secrets.ETHERSCAN_KEY }}
+#           FARM_ADDRESS: "0xd41a21f6a3debfe28b06ace2312a69c53107cee5"
+#       - name: Commit changes
+#         uses: EndBug/add-and-commit@v7
+#         with:
+#           author_name: Commitobot
+#           author_email: bruno@skvorc.me
+#           message: "Updating stakers!"
+#           add: "docs/cache/stakers.json"
